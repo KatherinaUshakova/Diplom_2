@@ -1,10 +1,13 @@
-import DataForTests.Order;
-import DataForTests.URLs;
+import api.client.OrderApi;
+import api.client.UserApi;
+import api.util.Order;
+import api.util.URLs;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import pojo.OrderIngredients;
+import api.model.OrderIngredients;
 
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -26,17 +29,19 @@ public class CreateOrderTest {
         this.userApi.deleteUser();
     }
 
+    @DisplayName("Создание заказа для авторизованного пользователя")
     @Test
     public void createOrderLoggedInTest() {
         userApi.saveTokens(this.userApi.createUserSuccessfully());
 
-        this.orderApi.createOrder(this.orderApi.makeChoice(), this.userApi.accessToken)
+        this.orderApi.createOrder(this.orderApi.makeChoice(), this.userApi.getAccessToken())
                 .then()
                 .statusCode(SC_OK)
                 .and()
                 .body( "success", equalTo(true));
     }
 
+    @DisplayName("Создание заказа для неавторизованного пользователя")
     @Test
     public void createOrderNotLoggedInTest() {
         this.orderApi.createOrder(this.orderApi.makeChoice(), "")
@@ -48,28 +53,30 @@ public class CreateOrderTest {
                 .body("success", equalTo(true));
     }
 
+    @DisplayName("создание заказа авторизованным пользователем без ингредиентов")
     @Test
     public void createOrderLoggedInWithoutIngredientsTest() {
         userApi.saveTokens(this.userApi.createUserSuccessfully());
         String[] order = {"", ""};
 
-        this.orderApi.createOrder(new OrderIngredients(order), this.userApi.accessToken)
+        this.orderApi.createOrder(new OrderIngredients(order), this.userApi.getAccessToken())
                 .then()
                 .statusCode(SC_INTERNAL_SERVER_ERROR);
 
-        this.orderApi.createOrder(new OrderIngredients(), this.userApi.accessToken)
+        this.orderApi.createOrder(new OrderIngredients(), this.userApi.getAccessToken())
                 .then()
                 .statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo(  "Ingredient ids must be provided"));
     }
 
+    @DisplayName("создание заказа авторизованным пользователем с неверным хешем ингредиентов")
     @Test
     public void createOrderWrongIngredientsTest() {
         userApi.saveTokens(this.userApi.createUserSuccessfully());
         String[] order = {Order.WRONG_HASH};
 
-        this.orderApi.createOrder(new OrderIngredients(order), this.userApi.accessToken)
+        this.orderApi.createOrder(new OrderIngredients(order), this.userApi.getAccessToken())
                 .then()
                 .statusCode(SC_BAD_REQUEST)
                 .and()

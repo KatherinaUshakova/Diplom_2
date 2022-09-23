@@ -1,5 +1,7 @@
-import DataForTests.URLs;
-import DataForTests.User;
+import api.client.UserApi;
+import api.util.URLs;
+import api.util.User;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.After;
@@ -26,6 +28,7 @@ public class UpdateUserTest {
         this.userApi.deleteUser();
     }
 
+    @DisplayName("обновить данные юзера")
     @Test
     public void updateUserTest() throws InterruptedException {
         this.userApi.loginUserSuccessfully();
@@ -59,10 +62,11 @@ public class UpdateUserTest {
         assertEquals(User.INVALID_EMAIL.toLowerCase(), newEmail);
     }
 
+    @DisplayName("обновить данные неавторизованного юзера")
     @Test
     public void updateNotAuthorizedUserTest() {
-        String correctToken = this.userApi.accessToken;
-        this.userApi.accessToken = "";
+        String correctToken = this.userApi.getAccessToken();
+        this.userApi.setAccessToken("");
 
         this.userApi.updateUser("name", "hoho")
                 .then()
@@ -72,7 +76,7 @@ public class UpdateUserTest {
                 .then()
                 .statusCode(SC_UNAUTHORIZED);
 
-        this.userApi.accessToken = correctToken;
+        this.userApi.setAccessToken(correctToken);
 
         this.userApi.loginUserSuccessfully();
     }

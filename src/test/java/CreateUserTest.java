@@ -1,5 +1,7 @@
-import DataForTests.URLs;
-import DataForTests.User;
+import api.client.UserApi;
+import api.util.URLs;
+import api.util.User;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.After;
@@ -20,13 +22,14 @@ public class CreateUserTest {
 
     @After
     public void tearDown() {
-        Response resp = this.userApi.loginUser(User.EMAIL, User.PASSWORD, this.userApi.accessToken);
+        Response resp = this.userApi.loginUser(User.EMAIL, User.PASSWORD, this.userApi.getAccessToken());
 
         if (resp.getStatusCode() == SC_OK) {
             this.userApi.deleteUser();
         }
     }
 
+    @DisplayName("Успешная регистрация пользователя")
     @Test
     public void createUserSuccessfullyTest() {
         Response response = this.userApi.createUserSuccessfully();
@@ -38,6 +41,7 @@ public class CreateUserTest {
         this.userApi.saveTokens(response);
     }
 
+    @DisplayName("создание существующего пользователя")
     @Test
     public void createExistedUserTest() {
         Response response = this.userApi.createUserSuccessfully();
@@ -52,6 +56,7 @@ public class CreateUserTest {
                 .body("message", equalTo("User already exists"));
     }
 
+    @DisplayName("создание неверного пользователя")
     @Test
     public void createInvalidUserTest() {
         this.userApi.createUser(User.EMAIL, User.PASSWORD, "")

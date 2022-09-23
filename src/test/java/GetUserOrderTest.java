@@ -1,4 +1,7 @@
-import DataForTests.URLs;
+import api.client.OrderApi;
+import api.client.UserApi;
+import api.util.URLs;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import org.junit.After;
 import org.junit.Before;
@@ -26,17 +29,18 @@ public class GetUserOrderTest {
         }
     }
 
+    @DisplayName("получить заказы авторизованным пользователем")
     @Test
     public void getOrdersByAuthorizedUserTest() {
         this.userApi.saveTokens(this.userApi.createUserSuccessfully());
 
-        this.orderApi.getOrders(userApi.accessToken)
+        this.orderApi.getOrders(userApi.getAccessToken())
                 .then()
                 .statusCode(SC_OK)
                 .and()
                 .body("success", equalTo(true));
     }
-
+    @DisplayName("получить заказы не авторизованным пользователем")
     @Test
     public void getOrdersByNotAuthorizedUserTest() {
         this.orderApi.getOrders("")

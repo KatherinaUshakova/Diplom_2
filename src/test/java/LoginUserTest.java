@@ -1,5 +1,7 @@
-import DataForTests.URLs;
-import DataForTests.User;
+import api.client.UserApi;
+import api.util.URLs;
+import api.util.User;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import org.junit.After;
 import org.junit.Before;
@@ -22,6 +24,7 @@ public class LoginUserTest {
         this.userApi.deleteUser();
     }
 
+    @DisplayName("залогинить юзера")
     @Test
     public void loginUserTest() {
         this.userApi.loginUserSuccessfully()
@@ -31,9 +34,10 @@ public class LoginUserTest {
                 .body("success", equalTo(true));
     }
 
+    @DisplayName("залогинить несуществующего юзера")
     @Test
     public void loginInvalidUserTest() throws InterruptedException {
-        this.userApi.loginUser("", User.PASSWORD, this.userApi.accessToken)
+        this.userApi.loginUser("", User.PASSWORD, this.userApi.getAccessToken())
                 .then()
                 .statusCode(SC_UNAUTHORIZED)
                 .and()
@@ -41,7 +45,7 @@ public class LoginUserTest {
 
         Thread.sleep(1000);
 
-        this.userApi.loginUser(User.EMAIL, User.INVALID_PASSWORD, this.userApi.accessToken)
+        this.userApi.loginUser(User.EMAIL, User.INVALID_PASSWORD, this.userApi.getAccessToken())
                 .then()
                 .statusCode(SC_UNAUTHORIZED)
                 .and()

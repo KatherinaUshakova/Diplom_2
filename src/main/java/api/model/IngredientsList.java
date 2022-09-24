@@ -1,7 +1,5 @@
 package api.model;
 
-import api.model.Ingredient;
-
 import java.util.List;
 
 public class IngredientsList {

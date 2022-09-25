@@ -1,0 +1,6 @@
+.idea
+src/.idea
+.allure
+target/*
+!target/surefire-reports
+
